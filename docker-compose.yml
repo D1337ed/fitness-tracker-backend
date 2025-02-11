@@ -1,0 +1,21 @@
+version: '3'
+services:
+  auth-service:
+    build: ./auth-service
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./auth-service/.env
+
+  calorie-service:
+    build: ./calorie-service
+    ports:
+      - "4000:4000"
+    env_file:
+      - ./calorie-service/.env
+
+  auth-maria:
+    image: mariadb
+
+  calorie-maria:
+    image: mariadb
