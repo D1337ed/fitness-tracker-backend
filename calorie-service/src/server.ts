@@ -1,15 +1,14 @@
 import express from 'express';
-import dotenv from 'dotenv';
-import calorieRoutes from './routes/calorieRoutes';
-
-dotenv.config();
+import bodyParser from 'body-parser';
+import { db } from './database/connection';
+import { listenForUserUpdates } from './services/messageQueue';
+import calculateRoutes from './routes/calculate';
 
 const app = express();
-const PORT = process.env.PORT || 4000;
+app.use(bodyParser.json());
 
-app.use(express.json());
-app.use('/calculate', calorieRoutes);
+app.use('/calculate', calculateRoutes);
 
-app.listen(PORT, () => {
-    console.log(`Calorie Service Running on Port ${PORT}`);
-});
+listenForUserUpdates();
+
+app.listen(3000, () => console.log('Calorie Microservice running on port 3000'));
