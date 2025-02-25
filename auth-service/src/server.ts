@@ -4,8 +4,9 @@ import session from 'express-session';
 import passport from 'passport';
 import './utils/passport';
 
-// TODO: fix env import
-dotenv.config();
+dotenv.config({
+    path: '.././.env'
+});
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -45,8 +46,19 @@ app.get(
     (req, res) => {
         if (!req.user) {
             res.status(400).json({error: "Authentication Failed"});
+
         }
         res.status(200).json(req.user);
+    }
+);
+
+app.get(
+    '/auth/google/redirect',
+    passport.authenticate('google', {
+        failureRedirect: '/'
+    }),
+    (req, res) => {
+        res.send('<h1>Successfully Authenticated</h1>');
     }
 );
 

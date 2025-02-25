@@ -2,15 +2,15 @@ import passport from 'passport';
 import {Profile, Strategy as GoogleStrategy, VerifyCallback} from 'passport-google-oauth20';
 import dotenv from 'dotenv';
 
-dotenv.config();
+dotenv.config({
+    path: '.././.env'
+});
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
 const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL;
 
 if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
-    console.log('ID ' + GOOGLE_CLIENT_ID)
-    console.log('SECRET ' + GOOGLE_CLIENT_SECRET);
     throw new Error('CLIENT_ID or CLIENT_SECRET not found');
 }
 
