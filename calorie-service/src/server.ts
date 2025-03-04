@@ -5,10 +5,13 @@ import { listenForUserUpdates } from './services/messageQueue';
 import calculateRoutes from './routes/calculate';
 
 const app = express();
+const PORT = process.env.PORT || 4000;
 app.use(bodyParser.json());
 
 app.use('/calculate', calculateRoutes);
 
 listenForUserUpdates();
 
-app.listen(3000, () => console.log('Calorie Microservice running on port 3000'));
+app.listen(PORT, () => {
+    console.log(`Calorie Service Running on Port ${PORT}`);
+});
