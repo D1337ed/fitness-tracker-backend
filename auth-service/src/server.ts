@@ -3,7 +3,11 @@ import express from 'express';
 import session from 'express-session';
 import passport from 'passport';
 import './utils/passport';
+import authRoutes from "./routes/authRoutes";
 
+/**
+ * Retrieve .env values
+ */
 dotenv.config({
     path: '.././.env'
 });
@@ -16,6 +20,7 @@ const SESSION_SECRET = process.env.SESSION_SECRET!;
  * Middleware to access json data
  */
 app.use(express.json());
+app.use('/auth', authRoutes);
 app.use(
     session({
         secret: SESSION_SECRET,
@@ -26,41 +31,6 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
-
-/**
- * Login Route
- */
-app.get('/', (req, res) => {
-    res.send('<a href="auth/google">Login with Google</a>');
-})
-
-/**
- * Callback Route
- */
-app.get(
-    '/auth/google',
-    passport.authenticate('google', {
-        accessType: 'offline',
-        scope: ['profile', 'email']
-    }),
-    (req, res) => {
-        if (!req.user) {
-            res.status(400).json({error: "Authentication Failed"});
-
-        }
-        res.status(200).json(req.user);
-    }
-);
-
-app.get(
-    '/auth/google/redirect',
-    passport.authenticate('google', {
-        failureRedirect: '/'
-    }),
-    (req, res) => {
-        res.send('<h1>Successfully Authenticated</h1>');
-    }
-);
 
 const start = async () => {
     try {
