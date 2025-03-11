@@ -1,28 +1,32 @@
-import amqp from 'amqplib';
-import { db } from '../database/connection';
+import amqp from "amqplib";
 
+const RABBITMQ_URL = "amqp://localhost"; // Standard-RabbitMQ-URL
 
-//ganerated wiu ig mir nid bi sicher gsi, öb ig da scho öpis mues berücksichtige -> tobi muesch haut de luege öb das so passt
-export async function listenForUserUpdates() {
-    const connection = await amqp.connect('amqp://localhost');
-    const channel = await connection.createChannel();
-    const queue = 'user_updates';
+export async function connectRabbitMQ() {
+    try {
+        // Verbindung zu RabbitMQ aufbauen
+        const connection = await amqp.connect(RABBITMQ_URL);
+        const channel = await connection.createChannel();
 
-    await channel.assertQueue(queue, { durable: true });
+        console.log("✅ Erfolgreich mit RabbitMQ verbunden");
+        return { connection, channel };
+    } catch (error) {
+        console.error("❌ Fehler bei der Verbindung zu RabbitMQ:", error);
+        process.exit(1); // Beendet das Programm, falls keine Verbindung möglich ist
+    }
+}
 
-    console.log(`Listening for messages in ${queue}`);
+export async function sendToQueue(queueName: string, message: any) {
+    try {
+        const { channel } = await connectRabbitMQ();
 
-    channel.consume(queue, async (msg) => {
-        if (msg !== null) {
-            const { userId, weight, height, age, gender } = JSON.parse(msg.content.toString());
+        await channel.assertQueue(queueName, { durable: true }); // Stellt sicher, dass die Queue existiert
+        channel.sendToQueue(queueName, Buffer.from(JSON.stringify(message)), {
+            persistent: true, // Sorgt dafür, dass die Nachricht nicht verloren geht
+        });
 
-            await db.query(
-                'UPDATE users SET weight = ?, height = ?, age = ?, gender = ? WHERE id = ?',
-                [weight, height, age, gender, userId]
-            );
-
-            console.log(`Updated user ${userId} in the database.`);
-            channel.ack(msg);
-        }
-    });
+        console.log(`📤 Nachricht an Queue '${queueName}' gesendet:`, message);
+    } catch (error) {
+        console.error("❌ Fehler beim Senden der Nachricht:", error);
+    }
 }
