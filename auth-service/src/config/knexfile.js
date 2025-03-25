@@ -1,4 +1,3 @@
-require('knex');
 require('dotenv').config({
     path: './.env',
 });
@@ -13,19 +12,28 @@ if (!DB_HOST || !DB_PORT || !DB_USER || !DB_PASSWORD || !DB_NAME) {
     throw new Error('Database Environment Variables not set');
 }
 
+/**
+ * @type { Object.<string, import("knex").Knex.Config> }
+ */
 module.exports = {
-    client: 'mysql',
-    connection: {
-        host: process.env.DATABASE_HOST || '127.0.0.1',
-        port: process.env.DB_PORT || 3306,
-        user: process.env.DATABASE_USER || 'fitness_admin',
-        password: process.env.DB_PASSWORD || 'password',
-        database: process.env.DB_NAME || 'fitness_tracker'
-    },
-    migrations: {
-        directory: '../database/migrations',
-    },
-    seeds: {
-        directory: '../database/seeds',
-    },
+    development: {
+        client: 'mysql',
+        connection: {
+            host: process.env.DATABASE_HOST || '127.0.0.1',
+            port: process.env.DB_PORT || 3306,
+            user: process.env.DATABASE_USER || 'fitness_admin',
+            password: process.env.DB_PASSWORD || 'password',
+            database: process.env.DB_NAME || 'fitness_tracker'
+        },
+        migrations: {
+            directory: '../database/migrations',
+        },
+        seeds: {
+            directory: '../database/seeds',
+        },
+        pool: {
+            min: 2,
+            max: 10
+        }
+    }
 };

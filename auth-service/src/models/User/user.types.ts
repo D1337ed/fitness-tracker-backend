@@ -1,10 +1,10 @@
-export interface User {
-    id?: number;
-    name: string;
+export interface DataBaseUser {
+    id: number;
+    displayName: string;
     email: string;
 }
 
-export interface UserSignUp {
-    name: string;
+export interface UserInput {
+    displayName: string;
     email: string;
 }

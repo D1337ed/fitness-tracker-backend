@@ -3,12 +3,13 @@ import express from 'express';
 import session from 'express-session';
 import passport from 'passport';
 import './utils/passport';
+import {findOrCreateUser, UserInput} from "./models/User";
 
 /**
  * Retrieve .env values
  */
 dotenv.config({
-    path: '.././.env'
+    path: '../config/.env'
 });
 
 const app = express();
@@ -64,13 +65,28 @@ app.get(
         scope: ['profile', 'email'],
         failureRedirect: '/auth/error'
     }),
-    (req, res) => {
+    async (req, res) => {
         // TODO: error handling
         if (!req.user) {
             res.status(400).json({error: "Authentication Failed"});
+        } else {
+            try {
+                const profile = req.user;
+
+                // console.log(`NAME: ${profile.displayName}`)
+                // console.log(`EMAIL: ${profile.emails[0].value}`)
+
+                const result = await findOrCreateUser({
+                    displayName: profile.displayName,
+                    email: profile.emails[0].value
+                });
+                console.log(`RESULT: ${result}`);
+            } catch (e) {
+                throw new Error('FAILED TO FIND OR CREATE USER');
+            }
         }
         console.log(res.status(200), req.user, "Successfully Authenticated");
-        res.redirect('/auth/success');
+        //res.redirect('/auth/success');
     }
 );
 

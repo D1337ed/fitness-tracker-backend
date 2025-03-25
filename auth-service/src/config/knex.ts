@@ -1,7 +1,6 @@
 import knex from 'knex';
-// TODO: fix path or module
-import config from './knexfile';
+// @ts-ignore
+import config from '../config/knexfile';
 
-const db = knex(config);
-
-export default db;
+const environment = process.env.NODE_ENV || 'development';
+export default knex(config[environment])

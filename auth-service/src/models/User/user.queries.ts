@@ -1,18 +1,18 @@
 import db from '../../config/knex';
-import {User, UserSignUp} from './user.types';
+import {DataBaseUser, UserInput} from './user.types';
 
 export const findUserByEmail = async (
     email: string
-): Promise<User | undefined> => {
-    return db<User>('users')
+): Promise<DataBaseUser | undefined> => {
+    return db.queryBuilder().from('users')
         .where('email', email)
         .first();
 };
 
 export const createUser = async (
-    userData: UserSignUp
-): Promise<User> => {
-    const [newUser] = await db<User>('users')
+    userData: UserInput
+): Promise<DataBaseUser> => {
+    const [newUser] = await db.queryBuilder().into('users')
         .insert(userData)
         .returning('*');
 
