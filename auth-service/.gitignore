@@ -4,3 +4,5 @@ node_modules
 ../.vscode
 ../auth-service/node_modules
 ../auth-service/.env
+../auth-service/.idea
+../auth-service/.vscode

@@ -3,7 +3,7 @@ import {Profile, Strategy as GoogleStrategy, VerifyCallback} from 'passport-goog
 import dotenv from 'dotenv';
 
 dotenv.config({
-    path: '.././.env'
+    path: './config/.env'
 });
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
