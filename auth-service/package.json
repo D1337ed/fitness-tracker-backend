@@ -24,7 +24,8 @@
     "mariadb": "^3.4.0",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "cookie-parser": "^1.4.7"
   },
   "devDependencies": {
     "@types/passport": "^1.0.17",
