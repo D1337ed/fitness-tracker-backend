@@ -10,7 +10,7 @@ app.use(express.json());
 
 app.use('/calculate', calculateRoutes);
 
-listenForUserUpdates();
+//listenForUserUpdates();
 
 app.listen(PORT, () => {
     console.log(`Calorie Service Running on Port ${PORT}`);

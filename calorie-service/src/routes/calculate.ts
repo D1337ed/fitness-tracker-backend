@@ -1,18 +1,44 @@
 import express from 'express';
 import { calculateCalories } from '../services/calculator';
+import { validateCalorieInput } from '../utils/validation';
 
 const router = express.Router();
 
-router.post('/', (req, res) => {
-    const { weight, height, age, gender } = req.body;
-
-    if (!weight || !height || !age || !gender) {
-        res.status(400).send({ error: 'Missing required parameters' });
-        return;
+function calculateAge(birthdate: string): number {
+    const today = new Date();
+    const birthDate = new Date(birthdate);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
     }
-    const calories = calculateCalories(weight, height, age, gender);
-    res.send({ calories });
-    return; 
+    return age;
+}
+
+router.post('/', (req, res) => {
+    try {
+        const validationResult = validateCalorieInput(req.body.user);
+
+        if (!validationResult.success) {
+            res.status(400).send({ error: 'Invalid input', details: validationResult.error });
+            return;
+        }
+
+        const user = validationResult.data;
+
+        if (!user) {
+            res.status(400).send({ error: 'Invalid input', details: 'User data is undefined' });
+            return;
+        }
+
+        const age = calculateAge(user.birthdate);
+
+        const calories = calculateCalories(user.weight, user.height, age, user.gender === 'M' ? 'male' : 'female');
+        res.send({ calories });
+    } catch (error) {
+        console.error('Error calculating calories:', error);
+        res.status(500).send({ error: 'Internal server error' });
+    }
 });
 
 export default router;
