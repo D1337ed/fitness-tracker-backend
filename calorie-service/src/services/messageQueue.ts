@@ -1,5 +1,5 @@
 /*
-/*import amqp from 'amqplib';
+import amqp from 'amqplib';
 import { db } from '../database/connection';
 
 
@@ -27,7 +27,7 @@ export async function listenForUserUpdates() {
         }
     });
 }
-*/
+
 import amqp from "amqplib";
 
 const RABBITMQ_URL = "amqp://localhost"; // Standard-RabbitMQ-URL

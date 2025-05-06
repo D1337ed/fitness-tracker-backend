@@ -5,8 +5,8 @@ export function calculateCalories(weight: number, height: number, age: number, g
         return 655.1 + (9.6 * weight) + (1.8 * height) - (4.7 * age);
     }
 }
-}
 
+/*
 // Hier wird die Nachricht von RabbitMq empfangen und direkt berechnet.
 // Wir loggen einfach alles momentan, aber man könnte auch an authservice zurückschicken...
 (async () => {
@@ -29,3 +29,4 @@ export function calculateCalories(weight: number, height: number, age: number, g
         }
     });
 })();
+*/
