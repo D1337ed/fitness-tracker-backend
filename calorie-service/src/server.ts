@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import calculateRoutes from './routes/calculate';
 import { initializeDatabase } from './database/initDatabase'; // <- Use the correct init function
+import { listenForUserUpdates } from './services/messageQueue';
 
 dotenv.config({ path: '/workspaces/fitness-tracker-backend/calorie-service/.env' });
 
@@ -16,13 +17,13 @@ initializeDatabase()
     .then(() => {
         console.log('Database initialized successfully.');
 
-        // Register routes after DB is ready
         app.use('/calculate', calculateRoutes);
 
-        // Start server
         app.listen(PORT, () => {
             console.log(`Calorie Service Running on Port ${PORT}`);
         });
+    }).then(() => {
+        listenForUserUpdates();
     })
     .catch((error) => {
         console.error('Failed to initialize database:', error);

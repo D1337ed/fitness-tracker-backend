@@ -1,3 +1,5 @@
+import { connectRabbitMQ } from "./messageQueue";
+
 export function calculateCalories(weight: number, height: number, age: number, gender: string): number {
     if (gender === 'male') {
         return 66.47 + (13.7 * weight) + (5 * height) - (6.8 * age);
@@ -6,7 +8,7 @@ export function calculateCalories(weight: number, height: number, age: number, g
     }
 }
 
-/*
+
 // Hier wird die Nachricht von RabbitMq empfangen und direkt berechnet.
 // Wir loggen einfach alles momentan, aber man könnte auch an authservice zurückschicken...
 (async () => {
@@ -29,4 +31,3 @@ export function calculateCalories(weight: number, height: number, age: number, g
         }
     });
 })();
-*/
