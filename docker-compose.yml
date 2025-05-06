@@ -1,21 +1,72 @@
-version: '3'
 services:
-  auth-service:
-    build: ./auth-service
-    ports:
-      - "3000:3000"
-    env_file:
-      - auth-service/.env
-
   calorie-service:
     build: ./calorie-service
     ports:
       - "4000:4000"
     env_file:
       - calorie-service/.env
-
-  auth-maria:
-    image: mariadb
+    depends_on:
+      - calorie-maria
+    networks:
+      - monitoring
 
   calorie-maria:
     image: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: calorie
+    volumes:
+      - calorie-mariadb-data:/var/lib/mysql
+    networks:
+      - monitoring
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - monitoring
+
+  loki:
+    image: grafana/loki:2.9.2
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./loki-config.yaml:/etc/loki/local-config.yaml
+    networks:
+      - monitoring
+
+  promtail:
+    image: grafana/promtail:2.9.2
+    volumes:
+      - /var/log:/var/log
+      - ./promtail-config.yaml:/etc/promtail/promtail.yaml
+    command: -config.file=/etc/promtail/promtail.yaml
+    networks:
+      - monitoring
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3001:3000"  # Host:Container, du kannst das auch zu 3000:3000 ändern
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    depends_on:
+      - prometheus
+      - loki
+    networks:
+      - monitoring
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+
+volumes:
+  calorie-mariadb-data:
+  grafana-storage:
+
+networks:
+  monitoring:

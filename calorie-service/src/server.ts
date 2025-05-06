@@ -5,9 +5,11 @@ import { initializeDatabase } from './database/initDatabase'; // <- Use the corr
 
 dotenv.config({ path: '/workspaces/fitness-tracker-backend/calorie-service/.env' });
 
+
 const app = express();
 const PORT = process.env.PORT || 4000;
 app.use(express.json());
+
 
 // Initialize the database BEFORE setting up routes or starting the server
 initializeDatabase()
