@@ -1,11 +1,7 @@
-import mysql from 'mysql2/promise';
-import dotenv from 'dotenv';
+import { getDb } from './initDatabase';
 
-dotenv.config();
-
-export const db = mysql.createPool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
-    database: process.env.DB_NAME,
-});
+export async function getSportByName(name: string) {
+    const db = getDb();
+    const [rows]: [any[], any] = await db.query('SELECT * FROM sports WHERE name = ?', [name]);
+    return rows[0];
+}

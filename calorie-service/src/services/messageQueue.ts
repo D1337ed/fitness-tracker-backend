@@ -1,4 +1,5 @@
-import amqp from 'amqplib';
+
+/*import amqp from 'amqplib';
 import { db } from '../database/connection';
 
 
@@ -26,3 +27,4 @@ export async function listenForUserUpdates() {
         }
     });
 }
+*/
