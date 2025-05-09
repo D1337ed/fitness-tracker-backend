@@ -1,30 +1,34 @@
 import mariadb from 'mariadb';
 import dotenv from "dotenv";
+import {createUserTable} from "./user.table";
+import { validateEnvVariables } from "../utils/validateEnv";
 
 dotenv.config({
     path: '../config/.env'
 });
 
-const DB_HOST = process.env.DATABASE_HOST;
-const DB_PORT = process.env.DATABASE_PORT;
-const DB_USER = process.env.DATABASE_USER;
-const DB_PASSWORD = process.env.DATABASE_PASSWORD;
-const DB_NAME = process.env.DATABASE_NAME;
+const { DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME } = validateEnvVariables();
 
-if (!DB_HOST || !DB_PORT || !DB_USER || !DB_PASSWORD || !DB_NAME) {
-    throw new Error('Database Environment Variables not found');
-}
-
-// TODO: make proper create if not exist
+// TODO: maybe move table creation outside to connection.ts
+// TODO: fix logs, currently show up even when the database is already present
 const database = mariadb.createConnection({
     host: DB_HOST || '127.0.0.1',
     port: Number(DB_PORT) || 3306,
     user: DB_USER || 'fitness_admin',
     password: DB_PASSWORD || 'password'
-}).then(connection => {
-    connection.query(`CREATE DATABASE IF NOT EXISTS ${DB_NAME}`)
-        .then(res => res).catch(error => error);
-    console.log('Successfully created fitness_tracker Database');
-});
+})
+    // mariadb doesn't support multiple SQL statement execution in one query by default for security reasons
+    // now using multiple queries instead of enabling multipleStatements: true
+    .then(async connection => {
+        try {
+            await connection.query(`CREATE DATABASE IF NOT EXISTS ${DB_NAME};`);
+            await connection.query(`USE ${DB_NAME};`);
+            await connection.query(createUserTable)
+                .then(res => res).catch(error => error);
+            console.log(`Successfully created ${DB_NAME} Database and added Table User`);
+        } catch (error) {
+            console.log(`Failed to create ${DB_NAME} Database and add Table User`)
+        }
+    });
 
 export default database;

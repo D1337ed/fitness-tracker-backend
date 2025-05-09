@@ -1,58 +1,43 @@
 import mariadb from "mariadb";
 import dotenv from "dotenv";
 import database from "./database";
-import {createUserTable} from "./user.table";
+import { validateEnvVariables } from "../utils/validateEnv";
 
 dotenv.config({
     path: '../config/.env'
 });
 
-const DB_HOST = process.env.DATABASE_HOST;
-const DB_PORT = process.env.DATABASE_PORT;
-const DB_USER = process.env.DATABASE_USER;
-const DB_PASSWORD = process.env.DATABASE_PASSWORD;
-const DB_NAME = process.env.DATABASE_NAME;
-
-if (!DB_HOST || !DB_PORT || !DB_USER || !DB_PASSWORD || !DB_NAME) {
-    throw new Error('Database Environment Variables not found');
-}
+const { DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME } = validateEnvVariables();
 
 const connection = mariadb.createConnection({
     host: DB_HOST || '127.0.0.1',
     port: Number(DB_PORT) || 3306,
     user: DB_USER || 'fitness_admin',
     password: DB_PASSWORD || 'password',
-    database: DB_NAME || 'fitness_tracker'
+    database: DB_NAME || 'fitness_tracker_auth'
+
 }).then(connection => {
-    console.log('Connected to fitness_tracker Database');
+    console.log(`Connected to ${DB_NAME} Database`);
     return connection;
 });
 
 // TODO: fix console log order messages
 const tryConnecting = async (attempts: number) => {
     try {
+        console.log(`Trying to connect to ${DB_NAME}`)
         await connection;
     } catch (error) {
+        console.log(`Caught error while trying to connect to ${DB_NAME}`)
         if (attempts > 0) {
-            console.log(`Connection to fitness_tracker Database failed, retrying for ${attempts} more time(s) in 1 second...`);
+            console.log(`Retrying to connect for ${attempts} more time(s) in 1 second...`);
             setTimeout(() => tryConnecting(attempts - 1), 1000);
             if (attempts === 0) {
-                console.log('Trying to set up fitness_tracker Database...');
+                console.log(`All retries failed, Database ${DB_NAME} may not exist`)
+                console.log(`Trying to set up ${DB_NAME} Database if not exists...`);
                 await database;
-                await addTableToDatabase();
+                console.log(`Set up ${DB_NAME}`);
             }
         }
-    }
-}
-
-// TODO: fix user.table.ts
-const addTableToDatabase = async () => {
-    try {
-        console.log('Trying to create users table in fitness_tracker Database...');
-        await createUserTable();
-        console.log('Successfully created users table in fitness_tracker Database');
-    } catch (error) {
-        console.log('Failed to create users table in fitness_tracker Database');
     }
 }
 
