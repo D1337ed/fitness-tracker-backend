@@ -1,31 +1,39 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import calculateRoutes from './routes/calculate';
-import { initializeDatabase } from './database/initDatabase'; // <- Use the correct init function
+import { initializeDatabase } from './database/initDatabase';
 import { listenForUserUpdates } from './services/messageQueue';
+import logger from './logger'; // Logger importieren
+import register from './metrics'; // Prometheus Metriken importieren
 
 dotenv.config({ path: '/workspaces/fitness-tracker-backend/calorie-service/.env' });
-
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 app.use(express.json());
 
-
-// Initialize the database BEFORE setting up routes or starting the server
+// Initialisierung der Datenbank
 initializeDatabase()
     .then(() => {
-        console.log('Database initialized successfully.');
+        logger.info('Database initialized successfully.');
 
         app.use('/calculate', calculateRoutes);
 
+        // Prometheus Metriken
+        app.get('/metrics', async (req, res) => {
+            res.set('Content-Type', register.contentType);
+            res.end(await register.metrics());
+        });
+
+        // Server starten
         app.listen(PORT, () => {
-            console.log(`Calorie Service Running on Port ${PORT}`);
+            logger.info(`Calorie Service Running on Port ${PORT}`);
         });
     }).then(() => {
+        // Warten auf Nutzeraktualisierungen
         listenForUserUpdates();
     })
     .catch((error) => {
-        console.error('Failed to initialize database:', error);
+        logger.error('Failed to initialize database: ' + error);
         process.exit(1);
     });
