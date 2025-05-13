@@ -5,14 +5,14 @@ services:
     ports:
       - "3000:3000"
     env_file:
-      - auth-service/.env
+      - auth-service/src/config/.env
 
   calorie-service:
     build: ./calorie-service
     ports:
       - "4000:4000"
     env_file:
-      - calorie-service/.env
+      - calorie-service/src/config/.env
 
   auth-maria:
     image: mariadb
