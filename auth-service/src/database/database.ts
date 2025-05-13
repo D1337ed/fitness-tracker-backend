@@ -1,17 +1,17 @@
 import mariadb from 'mariadb';
 import dotenv from "dotenv";
 import {createUserTable} from "./user.table";
-import { validateEnvVariables } from "../utils/validateEnv";
+import {validateEnvVariables} from "../utils/validateEnv";
 
 dotenv.config({
     path: '../config/.env'
 });
 
-const { DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME } = validateEnvVariables();
+const {DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME} = validateEnvVariables();
 
 // TODO: maybe move table creation outside to connection.ts
 // TODO: fix logs, currently show up even when the database is already present
-const database = mariadb.createConnection({
+const databaseSetup = mariadb.createConnection({
     host: DB_HOST || '127.0.0.1',
     port: Number(DB_PORT) || 3306,
     user: DB_USER || 'fitness_admin',
@@ -23,12 +23,14 @@ const database = mariadb.createConnection({
         try {
             await connection.query(`CREATE DATABASE IF NOT EXISTS ${DB_NAME};`);
             await connection.query(`USE ${DB_NAME};`);
-            await connection.query(createUserTable)
+            await connection.query(createUserTable);
+            await connection.end()
                 .then(res => res).catch(error => error);
+            // TODO: fix logs and script exec
             console.log(`Successfully created ${DB_NAME} Database and added Table User`);
         } catch (error) {
             console.log(`Failed to create ${DB_NAME} Database and add Table User`)
         }
     });
 
-export default database;
+export default databaseSetup;

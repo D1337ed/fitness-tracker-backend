@@ -1,3 +1,9 @@
+import dotenv from "dotenv";
+
+dotenv.config({
+    path: './config/.env'
+})
+
 export const validateEnvVariables = () => {
     const DB_HOST = process.env.DATABASE_HOST;
     const DB_PORT = process.env.DATABASE_PORT;
@@ -6,7 +12,7 @@ export const validateEnvVariables = () => {
     const DB_NAME = process.env.DATABASE_NAME;
 
     if (!DB_HOST || !DB_PORT || !DB_USER || !DB_PASSWORD || !DB_NAME) {
-        throw new Error('Database Environment Variables not found');
+        throw new Error('Database Environment Variables not found, verification not possible');
     }
 
     return { DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME };
