@@ -3,7 +3,7 @@ services:
     build:
       context: ./calorie-service
     volumes:
-      - ./logs/calorie:/app/logs/calorie 
+      - ./logs/calorie:/app/logs/calorie
     ports:
       - "4000:4000"
 
@@ -49,7 +49,7 @@ services:
   grafana:
     image: grafana/grafana
     ports:
-      - "3001:3000"  
+      - "3001:3000"
     volumes:
       - grafana-storage:/var/lib/grafana
     depends_on:
