@@ -9,7 +9,7 @@ export const findOrCreateUser = async (name: string, email: string) => {
             console.log(`No matching user found for ${email}, attempting to create new user`);
             await createUser(name, email);
         } else {
-            // TODO: pass middleware
+            // TODO: allow pass for middleware
             return null;
         }
     } catch (error) {

@@ -22,7 +22,6 @@ export const findUserByEmail = async (email: string)=> {
     }
 };
 
-// TODO: duplicate key error handling
 export const createUser = async (name: string, email: string) => {
 
     try {

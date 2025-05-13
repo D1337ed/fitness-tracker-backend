@@ -29,7 +29,6 @@ const tryConnecting = async (attempts: number) => {
         try {
             console.log(`Trying to connect to ${DB_NAME}...`)
             await databaseConnection;
-            // TODO: log success
             return;
         } catch (error) {
             console.log(`Connection attempt failed while trying to connect to ${DB_NAME}. Remaining attempts: ${attempts - 1}`);

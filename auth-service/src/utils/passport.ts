@@ -41,7 +41,6 @@ passport.use(
                 /**
                  * Find the User in the Database or Create it if it doesn't exist
                  */
-                // TODO: replace createUser function with findOrCreate function
                 try {
                     await findOrCreateUser(name, email);
                 } catch (error) {

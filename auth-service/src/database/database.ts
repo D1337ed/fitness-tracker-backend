@@ -9,8 +9,6 @@ dotenv.config({
 
 const {DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME} = validateEnvVariables();
 
-// TODO: maybe move table creation outside to connection.ts
-// TODO: fix logs, currently show up even when the database is already present
 const databaseSetup = mariadb.createConnection({
     host: DB_HOST || '127.0.0.1',
     port: Number(DB_PORT) || 3306,
@@ -26,7 +24,7 @@ const databaseSetup = mariadb.createConnection({
             await connection.query(createUserTable);
             await connection.end()
                 .then(res => res).catch(error => error);
-            // TODO: fix logs and script exec
+            // TODO: fix log, shows up even when the database is already present
             console.log(`Successfully created ${DB_NAME} Database and added Table User, ${__filename}`);
         } catch (error) {
             console.log(`Failed to create ${DB_NAME} Database and add Table User, ${__filename}`);
