@@ -27,9 +27,9 @@ const databaseSetup = mariadb.createConnection({
             await connection.end()
                 .then(res => res).catch(error => error);
             // TODO: fix logs and script exec
-            console.log(`Successfully created ${DB_NAME} Database and added Table User`);
+            console.log(`Successfully created ${DB_NAME} Database and added Table User, ${__filename}`);
         } catch (error) {
-            console.log(`Failed to create ${DB_NAME} Database and add Table User`)
+            console.log(`Failed to create ${DB_NAME} Database and add Table User, ${__filename}`);
         }
     });
 

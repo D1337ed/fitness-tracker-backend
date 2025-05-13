@@ -21,23 +21,37 @@ const databaseConnection = mariadb.createConnection({
     return databaseConnection;
 });
 
-// TODO: fix console log order messages
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+// TODO: fix console log order messages, maybe just use create if not exists without retries
 const tryConnecting = async (attempts: number) => {
-    try {
-        console.log(`Trying to connect to ${DB_NAME}`)
-        await databaseConnection;
-    } catch (error) {
-        console.log(`Caught error while trying to connect to ${DB_NAME}`)
-        if (attempts > 0) {
-            console.log(`Retrying to connect for ${attempts} more time(s) in 1 second...`);
-            setTimeout(() => tryConnecting(attempts - 1), 1000);
-            if (attempts === 0) {
-                console.log(`All retries failed, Database ${DB_NAME} may not exist`)
-                console.log(`Trying to set up ${DB_NAME} Database if not exists...`);
-                await databaseSetup;
-                tryConnecting(1).then(res => res);
-                console.log(`Set up ${DB_NAME}`);
+    while (attempts > 0) {
+        try {
+            console.log(`Trying to connect to ${DB_NAME}...`)
+            await databaseConnection;
+            // TODO: log success
+            return;
+        } catch (error) {
+            console.log(`Connection attempt failed while trying to connect to ${DB_NAME}. Remaining attempts: ${attempts - 1}`);
+            attempts--;
+            if (attempts > 0) {
+                console.log(`Retrying to connect for ${attempts} more time(s) in 1 second...`);
+                await delay(1000);
             }
+        }
+
+
+        console.log(`All retries failed. Database ${DB_NAME} may not be existent. Attempting to create ${DB_NAME}...`);
+        try {
+            await databaseSetup;
+            console.log(`${DB_NAME} setup complete. Retrying to connect...`);
+            await delay(2500);
+            await databaseConnection;
+            await delay(2500);
+            console.log(`Successfully connected to ${DB_NAME} after setup`);
+            /// TODO: currently throwing error even though databaseSetup passes
+        } catch (setupError) {
+            console.log(`Failed to setup or connect to ${DB_NAME} with ${setupError}`);
         }
     }
 }
