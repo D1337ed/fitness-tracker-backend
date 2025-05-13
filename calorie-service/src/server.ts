@@ -3,6 +3,9 @@ import dotenv from 'dotenv';
 import calculateRoutes from './routes/calculate';
 import { initializeDatabase } from './database/initDatabase';
 import { listenForUserUpdates } from './services/messageQueue';
+
+import './services/calculator'; // Importiert die Datei und führt den RabbitMQ-Consumer aus
+import { listenForCalculationRequests } from './services/calculator';
 import logger from './logger'; // Logger importieren
 import register from './metrics'; // Prometheus Metriken importieren
 
@@ -32,6 +35,7 @@ initializeDatabase()
     }).then(() => {
         // Warten auf Nutzeraktualisierungen
         listenForUserUpdates();
+        listenForCalculationRequests();
     })
     .catch((error) => {
         logger.error('Failed to initialize database: ' + error);

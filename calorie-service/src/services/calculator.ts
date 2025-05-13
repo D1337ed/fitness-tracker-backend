@@ -1,4 +1,5 @@
 import { connectRabbitMQ } from "./messageQueue";
+import amqp from "amqplib";
 
 export function calculateCalories(weight: number, height: number, age: number, gender: string): number {
     if (gender === 'male') {
@@ -11,17 +12,17 @@ export function calculateCalories(weight: number, height: number, age: number, g
 
 // Hier wird die Nachricht von RabbitMq empfangen und direkt berechnet.
 // Wir loggen einfach alles momentan, aber man könnte auch an authservice zurückschicken...
-(async () => {
-    const { channel } = await connectRabbitMQ();
+export async function listenForCalculationRequests(){
+    const connection = await amqp.connect('amqp://localhost');
+    const channel = await connection.createChannel();
     const QUEUE_NAME = "calculation_queue";
 
     await channel.assertQueue(QUEUE_NAME);
-    console.log("📥 Wartet auf Nachrichten...");
+    console.log("📥calculation queue Wartet auf Nachrichten...");
 
     channel.consume(QUEUE_NAME, (msg) => {
         if (msg !== null) {
             const { weight, height, age, gender } = JSON.parse(msg.content.toString());
-
             console.log("📩 Empfangene Daten:", { weight, height, age, gender });
 
             const result = calculateCalories(weight, height, age, gender);
@@ -30,4 +31,6 @@ export function calculateCalories(weight: number, height: number, age: number, g
             channel.ack(msg);
         }
     });
-})();
+}
+
+
